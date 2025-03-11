@@ -46,3 +46,5 @@ build/
 *.swo
 *.bak
 *.orig
+/.terraform.lock.hcl
+/.terraform/
