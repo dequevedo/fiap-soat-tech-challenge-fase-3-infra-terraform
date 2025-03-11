@@ -3,13 +3,82 @@ provider "aws" {
   region  = "us-east-1"
 }
 
-resource "aws_security_group" "web_sg" {
-  name        = "web-security-group"
-  description = "Permite acesso na porta 8080"
+# Criando a VPC para o EKS (caso não tenha)
+resource "aws_vpc" "eks_vpc" {
+  cidr_block = "10.0.0.0/16"
+
+  tags = {
+    Name = "eks-vpc"
+  }
+}
+
+# Criando subnets públicas
+resource "aws_subnet" "public_subnet" {
+  count = 2
+  vpc_id                  = aws_vpc.eks_vpc.id
+  cidr_block              = "10.0.${count.index}.0/24"
+  availability_zone       = element(["us-east-1a", "us-east-1b"], count.index)
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "eks-subnet-${count.index}"
+  }
+}
+
+# Criando a Role IAM para o EKS
+resource "aws_iam_role" "eks_role" {
+  name = "eks-cluster-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = [
+            "eks.amazonaws.com",
+            "ec2.amazonaws.com"
+          ]
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+# Criando o Cluster EKS
+resource "aws_eks_cluster" "eks" {
+  name     = "meu-cluster"
+  role_arn = aws_iam_role.eks_role.arn
+
+  vpc_config {
+    subnet_ids = aws_subnet.public_subnet[*].id
+  }
+}
+
+# Criando o Node Group com bloco correto de scaling_config
+resource "aws_eks_node_group" "node_group" {
+  cluster_name    = aws_eks_cluster.eks.name
+  node_group_name = "meu-node-group"
+  node_role_arn   = aws_iam_role.eks_role.arn
+  subnet_ids      = aws_subnet.public_subnet[*].id
+  instance_types  = ["t3.micro"]
+
+  scaling_config {
+    desired_size = 2
+    max_size     = 3
+    min_size     = 1
+  }
+}
+
+# Criando Security Group para o EKS
+resource "aws_security_group" "eks_sg" {
+  name        = "eks-security-group"
+  description = "Permite acesso interno no cluster"
 
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 0
+    to_port     = 65535
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -22,27 +91,15 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-resource "aws_instance" "web_server" {
-  ami           = "ami-05b10e08d247fb927"
-  instance_type = "t2.micro"
-  security_groups = [aws_security_group.web_sg.name]
-
-  user_data = <<-EOF
-    #!/bin/bash
-    sudo yum update -y
-    sudo yum install -y nginx
-    sudo systemctl start nginx
-    sudo systemctl enable nginx
-    echo "<h1>Hello, World!</h1>" | sudo tee /usr/share/nginx/html/index.html
-    sudo sed -i 's/listen       80;/listen 8080;/' /etc/nginx/nginx.conf
-    sudo systemctl restart nginx
-  EOF
-
-  tags = {
-    Name = "WebServer"
-  }
+# Outputs para acessar o cluster
+output "eks_cluster_name" {
+  value = aws_eks_cluster.eks.name
 }
 
-output "instance_public_ip" {
-  value = aws_instance.web_server.public_ip
+output "eks_cluster_endpoint" {
+  value = aws_eks_cluster.eks.endpoint
+}
+
+output "node_group_name" {
+  value = aws_eks_node_group.node_group.node_group_name
 }
