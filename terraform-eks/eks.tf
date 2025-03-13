@@ -52,30 +52,40 @@ module "eks" {
 }
 
 ### IAM Access Entries
+data "aws_iam_user" "existing_user" {
+  user_name = "poc-terraform-user"
+}
+
+# Cria o usuário apenas se ele não existir
 resource "aws_iam_user" "poc_terraform_user" {
-  name = "poc-terraform-user"
+  count = try(length(data.aws_iam_user.existing_user.arn), 0) > 0 ? 0 : 1
+  name  = "poc-terraform-user"
 }
 
 resource "aws_iam_policy_attachment" "eks_admin" {
+  count      = length(aws_iam_user.poc_terraform_user) > 0 ? 1 : 0
   name       = "eks_admin_attachment"
-  users      = [aws_iam_user.poc_terraform_user.name]
+  users      = aws_iam_user.poc_terraform_user[*].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSAdminPolicy"
 }
 
 resource "aws_iam_policy_attachment" "eks_cluster_admin" {
+  count      = length(aws_iam_user.poc_terraform_user) > 0 ? 1 : 0
   name       = "eks_cluster_admin_attachment"
-  users      = [aws_iam_user.poc_terraform_user.name]
+  users      = aws_iam_user.poc_terraform_user[*].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterAdminPolicy"
 }
 
 resource "aws_iam_policy_attachment" "eks_edit" {
+  count      = length(aws_iam_user.poc_terraform_user) > 0 ? 1 : 0
   name       = "eks_edit_attachment"
-  users      = [aws_iam_user.poc_terraform_user.name]
+  users      = aws_iam_user.poc_terraform_user[*].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSEditPolicy"
 }
 
 resource "aws_iam_policy_attachment" "eks_view" {
+  count      = length(aws_iam_user.poc_terraform_user) > 0 ? 1 : 0
   name       = "eks_view_attachment"
-  users      = [aws_iam_user.poc_terraform_user.name]
+  users      = aws_iam_user.poc_terraform_user[*].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSViewPolicy"
 }
