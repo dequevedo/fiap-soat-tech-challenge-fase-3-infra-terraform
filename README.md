@@ -19,6 +19,21 @@ Caso não possuir nenhum profile, criar um novo utilizando suas credenciais da A
 aws configure --profile meu-novo-perfil
 ```
 
+Definir um profile como ativo
+```sh
+export AWS_PROFILE=dequevedo-aws-profile
+```
+
+Obter o profile ativo
+```sh
+aws sts get-caller-identity --profile dequevedo-aws-profile
+```
+
+Atualizando o kubeconfig com as credenciais corretas
+```sh
+aws eks --region us-east-1 update-kubeconfig --name fiap-fase3-cluster --profile dequevedo-aws-profile
+```
+
 ## Terraform
 
 Inicializar o Terraform

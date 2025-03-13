@@ -4,6 +4,8 @@ module "eks" {
 
   cluster_name                   = local.name
   cluster_endpoint_public_access = true
+  authentication_mode = "API"
+  enable_cluster_creator_admin_permissions = true
 
   cluster_addons = {
     coredns = {
@@ -47,4 +49,33 @@ module "eks" {
   }
 
   tags = local.tags
+}
+
+### IAM Access Entries
+resource "aws_iam_user" "poc_terraform_user" {
+  name = "poc-terraform-user"
+}
+
+resource "aws_iam_policy_attachment" "eks_admin" {
+  name       = "eks_admin_attachment"
+  users      = [aws_iam_user.poc_terraform_user.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSAdminPolicy"
+}
+
+resource "aws_iam_policy_attachment" "eks_cluster_admin" {
+  name       = "eks_cluster_admin_attachment"
+  users      = [aws_iam_user.poc_terraform_user.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterAdminPolicy"
+}
+
+resource "aws_iam_policy_attachment" "eks_edit" {
+  name       = "eks_edit_attachment"
+  users      = [aws_iam_user.poc_terraform_user.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSEditPolicy"
+}
+
+resource "aws_iam_policy_attachment" "eks_view" {
+  name       = "eks_view_attachment"
+  users      = [aws_iam_user.poc_terraform_user.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSViewPolicy"
 }
