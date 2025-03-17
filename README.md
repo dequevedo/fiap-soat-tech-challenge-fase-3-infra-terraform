@@ -83,6 +83,31 @@ CURRENT   NAME                                                            CLUSTE
 
 Note que o * define qual o contexto atual, portanto, já pode ser utilizado para acessar o Lens.
 
+## Acessar a aplicação
+1. Garantir que está rodando o proxy para acessar o LoadBalancer:
+```sh
+aws eks update-kubeconfig --name fiap-fase3-cluster --region us-east-1 --profile dequevedo-aws-profile
+```
+
+2. Garantir que os comandos do Helm/K8s foram executados e os PODs e LoadBalancer estão rodando:
+
+3. Obter a URL do LoadBalancer
+```sh
+kubectl get svc
+```
+
+4. Algo assim será deve ser retornado:
+```
+NAME                      TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)          AGE
+fiap-tech-challenge-app   LoadBalancer   172.20.156.81    a11111119984d4281b0cb1111111db-1111111111.us-east-1.elb.amazonaws.com   8080:32005/TCP   5s
+```
+
+5. Fazer um GET:
+```sh
+curl --location 'http://a11111119984d4281b0cb1111111db-1111111111.us-east-1.elb.amazonaws.com:8080/orders'
+```
+Lembre-se de trocar o endereço acima pelo que foi retornado no passo 3.
+
 
 
 
