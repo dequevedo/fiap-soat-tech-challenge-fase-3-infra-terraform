@@ -13,5 +13,5 @@ locals {
 
 provider "aws" {
   region = "us-east-1"
-  profile = "dequevedo-aws-profile"
+  profile = "tech-challenge-aws-profile"
 }
