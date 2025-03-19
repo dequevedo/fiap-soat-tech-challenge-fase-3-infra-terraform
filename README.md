@@ -14,24 +14,24 @@ Obter detalhes do profile da AWS atual
 aws configure list
 ```
 
-Caso não possuir nenhum profile, criar um novo utilizando suas credenciais da AWS.
+Caso não possuir nenhum profile, criar um novo utilizando suas credenciais da AWS. Tenha em mãos o Access Key e Secret Key de um usuário da AWS dedicado ao terraform.
 ```sh
 aws configure --profile meu-novo-perfil
 ```
 
 Definir um profile como ativo
 ```sh
-export AWS_PROFILE=dequevedo-aws-profile
+export AWS_PROFILE=tech-challenge-aws-profile
 ```
 
 Obter o profile ativo
 ```sh
-aws sts get-caller-identity --profile dequevedo-aws-profile
+aws sts get-caller-identity --profile tech-challenge-aws-profile
 ```
 
 Atualizando o kubeconfig com as credenciais corretas
 ```sh
-aws eks --region us-east-1 update-kubeconfig --name fiap-fase3-cluster --profile dequevedo-aws-profile
+aws eks --region us-east-1 update-kubeconfig --name fiap-fase3-cluster --profile tech-challenge-aws-profile
 ```
 
 ## Terraform
@@ -65,9 +65,9 @@ kubectl config get-contexts
 
 2. Criar um novo Contexto do K8s para acessar o EKS da AWS:
 ```sh
-aws eks update-kubeconfig --name fiap-fase3-cluster --region us-east-1 --profile dequevedo-aws-profile
+aws eks update-kubeconfig --name fiap-fase3-cluster --region us-east-1 --profile tech-challenge-aws-profile
 ```
-Lembre-se de passar o ```sh --profile dequevedo-aws-profile``` com o nome correto do seu profile da AWS que possui as credenciais de acesso ao EKS.
+Lembre-se de passar o ```sh --profile tech-challenge-aws-profile``` com o nome correto do seu profile da AWS que possui as credenciais de acesso ao EKS.
 
 3. Verificar se o novo Contexto foi criado corretamente:
 ```sh
@@ -86,10 +86,12 @@ Note que o * define qual o contexto atual, portanto, já pode ser utilizado para
 ## Acessar a aplicação
 1. Garantir que está rodando o proxy para acessar o LoadBalancer:
 ```sh
-aws eks update-kubeconfig --name fiap-fase3-cluster --region us-east-1 --profile dequevedo-aws-profile
+aws eks update-kubeconfig --name fiap-fase3-cluster --region us-east-1 --profile tech-challenge-aws-profile
 ```
 
-2. Garantir que os comandos do Helm/K8s foram executados e os PODs e LoadBalancer estão rodando:
+2. Garantir que os comandos do Helm/K8s foram executados e os PODs e LoadBalancer estão rodando.
+Isso deve ser feito no repositório que contém a aplicação e os arquivos de configuração do Helm e Kubernetes. 
+Provavelmente será algo como ```helm install ...``` ou ```kubectl apply ...```
 
 3. Obter a URL do LoadBalancer
 ```sh
@@ -107,7 +109,3 @@ fiap-tech-challenge-app   LoadBalancer   172.20.156.81    a11111119984d4281b0cb1
 curl --location 'http://a11111119984d4281b0cb1111111db-1111111111.us-east-1.elb.amazonaws.com:8080/orders'
 ```
 Lembre-se de trocar o endereço acima pelo que foi retornado no passo 3.
-
-
-
-
