@@ -43,17 +43,17 @@ terraform init
 
 Verificar tudo que o Terraform fará
 ```sh
-terraform plan
+terraform -chdir=terraform-eks plan
 ```
 
 Aplicar o Terraform
 ```sh
-terraform apply -auto-approve
+terraform -chdir=terraform-eks apply -auto-approve
 ```
 
 Remover tudo que o Terraform criou
 ```sh
-terraform destroy -auto-approve
+terraform -chdir=terraform-eks destroy -auto-approve
 ```
 
 ## Visualizar o cluster utilizando Lens ou Monokle

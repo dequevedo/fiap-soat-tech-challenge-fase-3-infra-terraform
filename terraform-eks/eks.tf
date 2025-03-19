@@ -43,35 +43,3 @@ module "eks" {
 
   tags = local.tags
 }
-
-#### IAM Access Entries
-#variable "eks_users" {
-#  default = ["tech-challenge-terraform-user", "tech-challenge-github-actions-user"]
-#}
-#
-## Obtém a conta AWS atual para usar no ARN dos usuários
-#data "aws_caller_identity" "current" {}
-#
-## Cria IAM Access Entries para os usuários no EKS
-#resource "aws_eks_access_entry" "users" {
-#  for_each      = toset(var.eks_users)
-#  cluster_name  = module.eks.cluster_name
-#  principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${each.value}"
-#  type          = "STANDARD"
-#
-#  lifecycle {
-#    ignore_changes = [principal_arn]
-#  }
-#}
-#
-## Associa a política AmazonEKSClusterAdminPolicy aos usuários no EKS
-#resource "aws_eks_access_policy_association" "users" {
-#  for_each      = toset(var.eks_users)
-#  cluster_name  = module.eks.cluster_name
-#  policy_arn    = "arn:aws:eks::436648017334:access-policy/AmazonEKSClusterAdminPolicy"  # Substitua pelo ARN real!
-#  principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${each.value}"
-#
-#  access_scope {
-#    type = "cluster"
-#  }
-#}
