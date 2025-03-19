@@ -34,12 +34,6 @@ module "eks" {
 
       instance_types = ["t3.medium"]
       capacity_type  = "SPOT"
-
-      tags = {
-        ExtraTag = "helloworld"
-      }
     }
   }
-
-  tags = local.tags
 }
