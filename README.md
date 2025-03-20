@@ -21,17 +21,17 @@ aws configure --profile meu-novo-perfil
 
 Definir um profile como ativo
 ```sh
-export AWS_PROFILE=tech-challenge-aws-profile
+export AWS_PROFILE=default
 ```
 
 Obter o profile ativo
 ```sh
-aws sts get-caller-identity --profile tech-challenge-aws-profile
+aws sts get-caller-identity --profile default
 ```
 
 Atualizando o kubeconfig com as credenciais corretas
 ```sh
-aws eks --region us-east-1 update-kubeconfig --name fiap-fase3-cluster --profile tech-challenge-aws-profile
+aws eks --region us-east-1 update-kubeconfig --name tech-challenge-cluster --profile default
 ```
 
 ## Terraform
@@ -65,9 +65,9 @@ kubectl config get-contexts
 
 2. Criar um novo Contexto do K8s para acessar o EKS da AWS:
 ```sh
-aws eks update-kubeconfig --name fiap-fase3-cluster --region us-east-1 --profile tech-challenge-aws-profile
+aws eks update-kubeconfig --name tech-challenge-cluster --region us-east-1 --profile default
 ```
-Lembre-se de passar o ```sh --profile tech-challenge-aws-profile``` com o nome correto do seu profile da AWS que possui as credenciais de acesso ao EKS.
+Lembre-se de passar o ```sh --profile default``` com o nome correto do seu profile da AWS que possui as credenciais de acesso ao EKS.
 
 3. Verificar se o novo Contexto foi criado corretamente:
 ```sh
@@ -77,7 +77,7 @@ kubectl config get-contexts
 Algo assim deve aparecer:
 ```
 CURRENT   NAME                                                            CLUSTER                                                         AUTHINFO                                                        NAMESPACE
-*         arn:aws:eks:us-east-1:123456:cluster/fiap-fase3-cluster   arn:aws:eks:us-east-1:123456:cluster/fiap-fase3-cluster   arn:aws:eks:us-east-1:123456:cluster/fiap-fase3-cluster
+*         arn:aws:eks:us-east-1:123456:cluster/tech-challenge-cluster   arn:aws:eks:us-east-1:123456:cluster/tech-challenge-cluster   arn:aws:eks:us-east-1:123456:cluster/tech-challenge-cluster
           docker-desktop                                                  docker-desktop                                                  docker-desktop
 ```
 
@@ -86,7 +86,7 @@ Note que o * define qual o contexto atual, portanto, já pode ser utilizado para
 ## Acessar a aplicação
 1. Garantir que está rodando o proxy para acessar o LoadBalancer:
 ```sh
-aws eks update-kubeconfig --name fiap-fase3-cluster --region us-east-1 --profile tech-challenge-aws-profile
+aws eks update-kubeconfig --name tech-challenge-cluster --region us-east-1 --profile default
 ```
 
 2. Garantir que os comandos do Helm/K8s foram executados e os PODs e LoadBalancer estão rodando.
