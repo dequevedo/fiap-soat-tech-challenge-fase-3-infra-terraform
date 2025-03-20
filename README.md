@@ -38,7 +38,7 @@ aws eks --region us-east-1 update-kubeconfig --name tech-challenge-cluster --pro
 
 Inicializar o Terraform
 ```sh
-terraform init
+terraform -chdir=terraform-eks init
 ```
 
 Verificar tudo que o Terraform fará
