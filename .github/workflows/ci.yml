@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
-    paths: ["**/*.tf"]  # Gatilho para alterações em arquivos Terraform
+    paths: ["**/*.tf"]
   pull_request:
     branches:
       - main
-    paths: ["**/*.tf"]  # Gatilho para alterações em arquivos Terraform
+    paths: ["**/*.tf"]
   workflow_dispatch:
 
 permissions:
@@ -29,15 +29,21 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Defina a região correta para o seu EKS
+          aws-region: us-east-1
 
       - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: latest
 
-      - name: Inicializar Terraform
-        run: terraform init
+      - name: Inicializar Terraform com Backend S3
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.AWS_S3_BUCKET }}" \
+            -backend-config="key=state/terraform.tfstate" \
+            -backend-config="region=us-east-1" \
+            -backend-config="encrypt=true" \
+            -backend-config="dynamodb_table=${{ secrets.AWS_DYNAMODB_TABLE }}"
         working-directory: terraform-eks
 
       - name: Validar Terraform
@@ -63,17 +69,23 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Defina a região correta para o seu EKS
+          aws-region: us-east-1
 
       - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: latest
 
-      - name: Inicializar Terraform
-        run: terraform init
-        working-directory: terraform-eks  # Define o diretório para inicializar o Terraform
+      - name: Inicializar Terraform com Backend S3
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.AWS_S3_BUCKET }}" \
+            -backend-config="key=state/terraform.tfstate" \
+            -backend-config="region=us-east-1" \
+            -backend-config="encrypt=true" \
+            -backend-config="dynamodb_table=${{ secrets.AWS_DYNAMODB_TABLE }}"
+        working-directory: terraform-eks
 
       - name: Aplicar Terraform
         run: terraform apply -auto-approve
-        working-directory: terraform-eks  # Define o diretório para aplicar o Terraform
+        working-directory: terraform-eks
