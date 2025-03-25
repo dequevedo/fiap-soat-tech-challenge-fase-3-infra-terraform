@@ -8,6 +8,13 @@ locals {
   intra_subnets   = []
 }
 
+terraform {
+  backend "s3" {
+   region = "us-east-1"
+   key    = "terraform.tfstate"
+  }
+}
+
 provider "aws" {
   region = "us-east-1"
 }
