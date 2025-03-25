@@ -43,7 +43,7 @@ jobs:
             -backend-config="key=state/terraform.tfstate" \
             -backend-config="region=us-east-1" \
             -backend-config="encrypt=true" \
-            -backend-config="dynamodb_table=${{ secrets.AWS_DYNAMODB_TABLE }}"
+            -backend-config="use_lock_table=true"
         working-directory: terraform-eks
 
       - name: Validar Terraform
