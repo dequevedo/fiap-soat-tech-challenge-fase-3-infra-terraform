@@ -1,0 +1,79 @@
+name: Deploy Terraform Infra
+
+on:
+  push:
+    branches:
+      - main
+    paths: ["**/*.tf"]  # Gatilho para alterações em arquivos Terraform
+  pull_request:
+    branches:
+      - main
+    paths: ["**/*.tf"]  # Gatilho para alterações em arquivos Terraform
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Configurar AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # Defina a região correta para o seu EKS
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Inicializar Terraform
+        run: terraform init
+        working-directory: terraform-eks
+
+      - name: Validar Terraform
+        run: terraform validate
+        working-directory: terraform-eks
+
+      - name: Planejar Terraform
+        run: terraform plan
+        working-directory: terraform-eks
+
+  deploy:
+    name: Terraform Deploy
+    needs: plan
+    if: github.ref == 'refs/heads/main' 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Configurar AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # Defina a região correta para o seu EKS
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Inicializar Terraform
+        run: terraform init
+        working-directory: terraform-eks  # Define o diretório para inicializar o Terraform
+
+      - name: Aplicar Terraform
+        run: terraform apply -auto-approve
+        working-directory: terraform-eks  # Define o diretório para aplicar o Terraform
