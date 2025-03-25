@@ -33,6 +33,7 @@ module "eks" {
 
       instance_types = ["t3.medium"]
       capacity_type  = "SPOT"
+      security_groups = [aws_security_group.eks_sg.id]
     }
   }
 }
