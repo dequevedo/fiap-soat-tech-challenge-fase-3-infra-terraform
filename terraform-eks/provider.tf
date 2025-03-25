@@ -10,11 +10,7 @@ locals {
 
 terraform {
   backend "s3" {
-    bucket = var.s3_bucket
-    key  = "state/terraform.tfstate"
-    region = "us-east-1"
-    encrypt = true
-    dynamodb_table = var.dynamodb_table
+
   }
 }
 
